@@ -1,4 +1,4 @@
-# LLN-to-Anki-with-Pronounciaitons
+# Japanese-LLN-to-Anki-with-Romaji
 Convert Japanese word exports from Language-Learning-with-Netflix to an Anki tsv with an additional pronunciation field.
 
 This is to be used for Japanese learners using the [Language Learning with Netflix](https://languagelearningwithnetflix.com/) to study Japanese. The script takes as input .json files exported by LLN and exports tab-seperated-values files containing additional pronounciation data that I have found helpful for studying with Anki.
