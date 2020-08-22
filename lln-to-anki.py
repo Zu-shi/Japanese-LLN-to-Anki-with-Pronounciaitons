@@ -16,35 +16,39 @@ parser.add_argument('--outdir', type=str, nargs=1,
 args = parser.parse_args()
 
 for arg in vars(args):
-  if arg == 'files':
-    for file in getattr(args, arg):
-      with open(file, 'r', encoding="utf8") as f_in:
-        words = json.load(f_in)
+  if arg != 'files':
+    continue
 
-        # By default write to working directory.
-        outfile = Path(file).with_suffix('.tsv').name
+  for file in getattr(args, arg):
+    with open(file, 'r', encoding="utf8") as f_in:
+      words = json.load(f_in)
 
-        # TODO: this feels sloppy, what's the pythonic way to write this?
-        if args.outdir is not None:
-          outfile = args.outdir[0] + Path(file).stem + '.tsv'
+      # By default write to working directory.
+      outfile = Path(file).with_suffix('.tsv').name
 
-        print('Writing to ', outfile, '...\n')
+      # TODO: this feels sloppy, what's the pythonic way to write this?
+      if args.outdir is not None:
+        outfile = args.outdir[0] + Path(file).stem + '.tsv'
 
-        with codecs.open(outfile, 'w', 'utf-8') as f_out:
-          f_out.write(u'Tags: LLN, Netflix, Japanese, LLN-to-Anki, ' + Path(file).stem + '\n')
-          f_out.write(u'# optional_hiragana is a special field that is populated only if hiragana form is not the same as the original \n')
-          f_out.write(u'# Word_Original, Optional_Hiragana, Reading, Meaning, Subtitle, Subtitle_Human_Translation \n')
+      print('Writing to ', outfile, '...\n')
 
-          for word in words:
-            original_word = word['wordLemma']
-            reading = kks.convert(original_word)[0]['hepburn']
-            meaning = word['wordDefinition']
-            subtitle = word['subtitleContext']['subs'][1].replace('\n', '<br/>')
-            subtitle_human_translation = word['subtitleContext']['mTranslations'][1].replace('\n', '<br/>')
+      with codecs.open(outfile, 'w', 'utf-8') as f_out:
+        f_out.write(u'Tags: LLN, Netflix, Japanese, LLN-to-Anki, ' + Path(file).stem + '\n')
+        f_out.write(u'# Word_Original, Optional_Hiragana, Reading, Meaning, Subtitle, Subtitle_Human_Translation \n')
 
-            hiragana = kks.convert(original_word)[0]['hira']
-            optional_hiragana = hiragana if hiragana is not original_word else ""
+        for word in words:
+          if word['language'] != 'ja':
+            continue
 
-            f_out.write(u"{}\t{}\t{}\t{}\t{}\t{}\n".format(original_word, optional_hiragana, reading, meaning, subtitle, subtitle_human_translation))
+          original_word = word['wordLemma']
+          reading = kks.convert(original_word)[0]['hepburn']
+          meaning = word['wordDefinition']
+          subtitle = word['subtitle'].replace('\n', '<br/>')
+          subtitle_translation = word['translation'].replace('\n', '<br/>')
+
+          hiragana = kks.convert(original_word)[0]['hira']
+          optional_hiragana = hiragana if hiragana != original_word else ""
+
+          f_out.write(u"{}\t{}\t{}\t{}\t{}\t{}\n".format(original_word, optional_hiragana, reading, meaning, subtitle, subtitle_translation))
 
 print("DONE")
