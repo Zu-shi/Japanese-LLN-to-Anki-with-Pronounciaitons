@@ -33,7 +33,7 @@ for arg in vars(args):
       print('Writing to ', outfile, '...\n')
 
       with codecs.open(outfile, 'w', 'utf-8') as f_out:
-        f_out.write(u'Tags: LLN, Netflix, Japanese, LLN-to-Anki, ' + Path(file).stem + '\n')
+        f_out.write(u'tags:LLN Netflix Japanese LLN-to-Anki ' + Path(file).stem + '\n')
         f_out.write(u'# Word_Original, Optional_Hiragana, Reading, Meaning, Subtitle, Subtitle_Human_Translation \n')
 
         for word in words:
@@ -43,8 +43,8 @@ for arg in vars(args):
           original_word = word['wordLemma']
           reading = kks.convert(original_word)[0]['hepburn']
           meaning = word['wordDefinition']
-          subtitle = word['subtitle'].replace('\n', '<br/>')
-          subtitle_translation = word['translation'].replace('\n', '<br/>')
+          subtitle = word['subtitle'].replace('\n', '<br>')
+          subtitle_translation = word['translation'].replace('\n', '<br>')
 
           hiragana = kks.convert(original_word)[0]['hira']
           optional_hiragana = hiragana if hiragana != original_word else ""
