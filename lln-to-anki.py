@@ -1,6 +1,6 @@
 # coding=UTF-8
 
-import pykakasi, json, argparse, codecs
+import pykakasi, json, argparse, codecs, traceback
 from pathlib import Path
 
 kks = pykakasi.kakasi()
@@ -30,25 +30,33 @@ for arg in vars(args):
       if args.outdir is not None:
         outfile = args.outdir[0] + Path(file).stem + '.tsv'
 
-      print('Writing to ', outfile, '...\n')
+      print('Writing to {}.\n'.format(outfile))
 
+      words_written = 0
       with codecs.open(outfile, 'w', 'utf-8') as f_out:
         f_out.write(u'tags:LLN Netflix Japanese LLN-to-Anki ' + Path(file).stem + '\n')
         f_out.write(u'# Word_Original, Optional_Hiragana, Reading, Meaning, Subtitle, Subtitle_Human_Translation \n')
 
         for word in words:
-          if word['language'] != 'ja':
-            continue
+          try:
+            if word['language'] != 'ja' or word['word'] == '':
+              continue
 
-          original_word = word['wordLemma']
-          reading = kks.convert(original_word)[0]['hepburn']
-          meaning = word['wordDefinition']
-          subtitle = word['subtitle'].replace('\n', '<br>')
-          subtitle_translation = word['translation'].replace('\n', '<br>')
+            original_word = word['wordLemma']
+            reading = kks.convert(original_word)[0]['hepburn']
+            meaning = word['wordDefinition']
+            subtitle = word['subtitle'].replace('\n', '<br>')
+            subtitle_translation = word['translation'].replace('\n', '<br>')
 
-          hiragana = kks.convert(original_word)[0]['hira']
-          optional_hiragana = hiragana if hiragana != original_word else ""
+            hiragana = kks.convert(original_word)[0]['hira']
+            optional_hiragana = hiragana if hiragana != original_word else ""
 
-          f_out.write(u"{}\t{}\t{}\t{}\t{}\t{}\n".format(original_word, optional_hiragana, reading, meaning, subtitle, subtitle_translation))
+            f_out.write(u"{}\t{}\t{}\t{}\t{}\t{}\n".format(original_word, optional_hiragana, reading, meaning, subtitle, subtitle_translation))
+            words_written += 1
+          except Exception as e:
+            print("Exception parsing ", word)
+            traceback.print_exc()
+            pass
+      print('{} words written to {}.\n'.format(words_written, outfile))
 
 print("DONE")
