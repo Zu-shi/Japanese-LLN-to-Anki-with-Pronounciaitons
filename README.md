@@ -60,4 +60,4 @@ Pass in the `-h` flag for more detailed usage.
 
 ## Feedback and Suggestions
 
-The script is currently Tested for Windows 10 running on Python 3.6. For questions, please open an issue. Feel free to submit PRs for improvements.
+The script is currently tested for Windows 10 running on Python 3.6. For questions, please open an issue. Feel free to submit PRs for improvements.
